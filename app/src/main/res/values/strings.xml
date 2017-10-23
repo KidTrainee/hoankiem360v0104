@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hoàn Kiếm 360</string>
+    <string name="close_navigation_drawer">Navigation Drawer Close</string>
+    <string name="open_navigation_drawer">Navigation Drawer Open</string>
+    <string name="check_wifi_request">Không có kết nối Internet. Kiểm tra WIFI.</string>
+    <string name="agree">Đồng ý</string>
+    <string name="exit">Thoát</string>
+    <string name="access_network_state">Thiết bị cần quyền truy cập vào trạng thái mạng.</string>
+    <string name="thank_you_message">Xin cảm ơn!</string>
+    <string name="not_support_message">Không hỗ trợ tính năng này</string>
+    <string name="action_search">Tìm kiếm</string>
+    <string name="action_location_list">Địa danh</string>
+    <string name="action_location_map">Bản đồ</string>
+    <string name="action_contact">Liên hệ</string>
+    <string name="action_about_us">Về chúng tôi</string>
+    <string name="do_search">Search button clicked</string>
+    <string name="request_rationale">HoanKiem360 cần quyền truy cập vào: Internet</string>
+    <string name="action_home">Trang chủ</string>
+    <string name="action_settings">Cài đặt</string>
+    <string name="do_settings">Ấn nút cài đặt</string>
+    <string name="action_my_location">Vị trí của tôi</string>
+    <string name="banner_text">Hãy cùng khám phá Quận Hoàn Kiếm thông qua ảnh 360 của chúng tôi</string>
+    <!-- Settings -->
+    <string name="contact_info">Thông tin liên hệ:</string>
+    <string name="follow_info">Theo dõi</string>
+    <string name="author">Tác giả</string>
+    <string name="third_parties">Bên thứ ba</string>
+    <string name="choose_languages">Chọn ngôn ngữ</string>
+    <string name="settings">Cài đặt</string>
+    <string name="about">Về HoànKiếm360 và Ứng dụng này</string>
+    <string name="version">Version</string>
+    <string name="thank_you">Cám ơn bạn đã cài đặt ứng dụng này!</string>
+    <string name="app_version">v1.3.5</string>
+    <string name="developers">Nhà phát triển</string>
+    <string name="copyrights">Bản quyền</string>
+    <string name="rate_this_app">Đánh giá ứng dụng này tại Google Play Store</string>
+
+    <string name="PREF_KEY_LANGUAGES">hoan_kiem_360_preference_key_language</string>
+    <string name="PREF_KEY_THIRD_PARTIES">hoan_kiem_360_preference_key_third_parties</string>
+    <string name="PREF_KEY_DEVELOPERS">hoan_kiem_360_preference_key_developers</string>
+    <string name="PREF_KEY_COPYRIGHTS">hoan_kiem_360_preference_key_copyrights</string>
+    <string name="PREF_KEY_RATE_THIS_APP">hoan_kiem_360_preference_key_rate_application</string>
+    <!-- Booking -->
+    <string name="booking">Đặt phòng</string>
+    <string name="see_room">Xem Phòng</string>
+    <string name="done">Xong</string>
+    <string name="booking_customer_name">Họ và tên</string>
+    <string name="sample_activity_booking_title">Khách sạn Đoan Trang Hotel - Phố Mới</string>
+    <string name="booking_customer_email">Email</string>
+    <string name="booking_customer_check_in_date">Check-in</string>
+    <string name="booking_customer_phone">Số điện thoại</string>
+    <string name="booking_customer_check_out_date">Check-out</string>
+    <string name="booking_customer_room_numbers">Số phòng</string>
+    <string name="booking_customer_people_numbers">Số người</string>
+    <string name="check_out">Ngày đi</string>
+    <string name="check_in">Ngày đến</string>
+    <string name="error_missing_info">Xin nhập đủ thông tin!</string>
+    <string name="submit_success">Đặt phòng Thành công!</string>
+    <string name="submit_error">Lỗi trong quá trình đặt phòng!</string>
+    <string name="error">Lỗi</string>
+    <string name="third_parties_string_clicked">Click Third Parties</string>
+    <string name="uploading_message">Đang xử lý thông tin!</string>
+    <string name="loading">Đang tải dữ liệu</string>
+    <string name="permission_request_location">Hoankiem360 cần quyền cấp quyền để xác định vị trí hiện tại của bạn</string>
+    <string name="not_support_loading_current_location">Không thể xác định vị trí hiện tại của bạn.</string>
+    <string name="loading_position">Đang cập nhật vị trí! Xin hãy đợi...</string>
+    <string name="turn_on_network_provider_request">Bật chế độ định vị bằng WIFI để lấy vị trí nhanh hơn.</string>
+    <string name="to_location_setting">Cài đặt vị trí</string>
+    <string name="turn_on_location_provider_request">Bật chế độ định vị cho chức năng này.</string>
+    <string name="function_not_supported">Không thể sử dụng chức năng này.</string>
+
+</resources>

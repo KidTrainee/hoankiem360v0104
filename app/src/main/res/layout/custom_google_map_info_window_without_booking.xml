@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="4dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/custom_google_map_info_window_btn_360_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:tint="@color/colorWhite"
+            android:background="@drawable/round_border_solid_primary"
+            android:padding="4dp"
+            android:layout_margin="4dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_360_image"
+            android:text="@string/see_room"
+            android:textColor="@color/colorWhite" />
+
+        <TextView
+            android:id="@+id/custom_google_map_info_window_without_booking_tv_location_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="Quận Hoàn Kiếm"
+            android:background="@drawable/round_border_solid_primary_transparent_90"
+            android:textColor="@color/colorWhite" />
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

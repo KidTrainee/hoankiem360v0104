@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:title="@string/settings">
+
+        <ListPreference
+            android:entries="@array/language_array"
+            android:entryValues="@array/language_array_code"
+            android:key="@string/PREF_KEY_LANGUAGES"
+            android:title="@string/choose_languages"
+            android:summary="defaultValue"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/about">
+
+        <Preference
+            android:title="@string/rate_this_app"
+            android:key="@string/PREF_KEY_RATE_THIS_APP"/>
+
+        <Preference
+            android:title="@string/third_parties"
+            android:key="@string/PREF_KEY_THIRD_PARTIES"/>
+
+        <Preference
+            android:title="@string/developers"
+            android:key="@string/PREF_KEY_DEVELOPERS"/>
+
+        <Preference
+            android:title="@string/copyrights"
+            android:key="@string/PREF_KEY_COPYRIGHTS"/>
+
+        <Preference
+            android:title="@string/version"
+            android:summary="@string/app_version"/>
+
+    </PreferenceCategory>
+
+
+
+    <PreferenceCategory
+        android:title="@string/thank_you"/>
+</PreferenceScreen>

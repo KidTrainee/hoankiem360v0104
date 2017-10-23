@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/MyAppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/activity_settings_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:minHeight="?attr/actionBarSize"
+            android:fitsSystemWindows="true"
+            app:layout_scrollFlags="scroll|snap"
+            app:popupTheme="@style/MyPopupOverlay">
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryTransparent25"
+        android:fitsSystemWindows="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="4dp">
+
+                <TextView
+                    android:id="@+id/activity_booking_textView_hotel_title"
+                    style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:gravity="center"
+                    android:text="@string/sample_activity_booking_title"
+                    android:textColor="@color/colorPrimary" />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/activity_booking_textInputLayout_customer_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/round_border_solid_white"
+                android:nextFocusDown="@+id/activity_booking_textInputEdittext_room_numbers">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/textInputEditText6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_border_solid_white"
+                    android:drawablePadding="4dp"
+                    android:drawableStart="@drawable/ic_person_black"
+                    android:hint="@string/booking_customer_name"
+                    android:inputType="textNoSuggestions"
+                    android:nextFocusDown="@+id/activity_booking_textInputEdittext_room_numbers"
+                    android:padding="4dp" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/activity_booking_textInputLayout_customer_room_numbers"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height50dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round_border_solid_white">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/activity_booking_textInputEdittext_room_numbers"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/round_border_solid_white"
+                        android:drawablePadding="4dp"
+                        android:drawableStart="@drawable/ic_room"
+                        android:hint="@string/booking_customer_room_numbers"
+                        android:inputType="number"
+                        android:nextFocusDown="@+id/activity_booking_textInputEdittext_people_numbers"
+                        android:padding="4dp"
+                        android:textColorHint="@color/colorPrimary" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/activity_booking_textInputLayout_customer_people_numbers"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height50dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round_border_solid_white">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/activity_booking_textInputEdittext_people_numbers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round_border_solid_white"
+                        android:drawablePadding="4dp"
+                        android:drawableStart="@drawable/ic_multi_people"
+                        android:hint="@string/booking_customer_people_numbers"
+                        android:inputType="number"
+                        android:nextFocusDown="@+id/activity_booking_textInputEdittext_check_in_date"
+                        android:padding="4dp"
+                        android:textColorHint="@color/colorPrimary" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/activity_booking_textInputLayout_customer_date_start"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height50dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round_border_solid_white">
+
+                    <TextView
+                        android:id="@+id/activity_booking_tv_check_in_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/round_border_solid_white"
+                        android:clickable="false"
+                        android:drawablePadding="4dp"
+                        android:drawableStart="@drawable/ic_hotel_check_in"
+                        android:gravity="center_vertical"
+                        android:hint="@string/booking_customer_check_in_date"
+                        android:nextFocusDown="@+id/activity_booking_textInputEdittext_check_out_date"
+                        android:padding="4dp"
+                        android:textColorHint="@color/colorBlue" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/activity_booking_textInputLayout_customer_date_end"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height50dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round_border_solid_white">
+
+                    <TextView
+                        android:id="@+id/activity_booking_tv_check_out_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/round_border_solid_white"
+
+                        android:clickable="false"
+                        android:drawablePadding="4dp"
+                        android:drawableStart="@drawable/ic_hotel_check_out"
+                        android:gravity="center_vertical"
+                        android:hint="@string/booking_customer_check_out_date"
+                        android:inputType="date"
+                        android:nextFocusDown="@+id/activity_booking_textInputEdittext_phone"
+                        android:padding="4dp"
+                        android:textColorHint="@color/colorPrimary" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/activity_booking_textInputLayout_customer_phone"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height50dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/round_border_solid_white">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/activity_booking_textInputEdittext_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_border_solid_white"
+                    android:drawablePadding="4dp"
+                    android:drawableStart="@drawable/ic_phone"
+                    android:hint="@string/booking_customer_phone"
+                    android:inputType="phone"
+                    android:nextFocusDown="@+id/activity_booking_textInputEdittext_email"
+                    android:padding="4dp"
+                    android:textColorHint="@color/colorPrimary" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/activity_booking_textInputLayout_customer_email"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height50dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/round_border_solid_white">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/activity_booking_textInputEdittext_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_border_solid_white"
+                    android:drawablePadding="4dp"
+                    android:drawableStart="@drawable/ic_email"
+                    android:hint="@string/booking_customer_email"
+                    android:inputType="textEmailAddress"
+                    android:padding="4dp"
+                    android:textColorHint="@color/colorPrimary" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activity_booking_btn_booking"
+                android:background="@drawable/round_border_solid_primary"
+                android:text="@string/booking"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:layout_gravity="center_horizontal"/>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>
