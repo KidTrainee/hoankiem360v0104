@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#BF360C</color>
-    <color name="colorPrimaryDark">#98350d</color>
+    <color name="colorPrimary">#98350d</color>
+    <color name="colorPrimaryDark">#6e2f2d</color>
     <color name="colorPrimaryTransparent25">#25BF360C</color>
     <color name="colorPrimaryTransparent75">#75BF360C</color>
     <color name="colorPrimaryTransparent90">#90BF360C</color>
@@ -12,4 +12,5 @@
     <color name="colorBlackTransparent50">#50000000</color>
     <color name="colorBlue">#2196F3</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorYellow">#FFDE00</color>
 </resources>

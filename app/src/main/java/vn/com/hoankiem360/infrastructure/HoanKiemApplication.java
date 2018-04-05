@@ -21,6 +21,8 @@ import vn.com.hoankiem360.utils.Constants;
 
 public class HoanKiemApplication extends Application {
 
+    public static final String TAG = HoanKiemApplication.class.getSimpleName();
+
     public static final String PREFS_HOAN_KIEM_APPLICATION = "vn.manmo.hoankiem360";
     public static final String PREFS_IS_FIRST_TIME = PREFS_HOAN_KIEM_APPLICATION+".is_first_time";
     public static final String PREFS_LOCATION_MODE = PREFS_HOAN_KIEM_APPLICATION+".location_mode";
@@ -32,6 +34,12 @@ public class HoanKiemApplication extends Application {
     public static final String PREFS_ABOUT_US_URL = PREFS_HOAN_KIEM_APPLICATION+".about_us_url";
     private static final String PREFS_FIRST_TIME_SETTINGS = PREFS_HOAN_KIEM_APPLICATION + ".first_time_settings";
     private static final String PREFS_LOCALE = PREFS_HOAN_KIEM_APPLICATION + ".locale";
+
+    private static final String PREFS_IS_FIRST_TIME_HOME_FRAGMENT = PREFS_HOAN_KIEM_APPLICATION + "is_first_time_home_fragment";
+    private static final String PREFS_MAP_ACTIVITY_COUNTER = PREFS_HOAN_KIEM_APPLICATION + "_map_activity_counter";
+    private static final String PREFS_MAIN_ACTIVITY_COUNTER = PREFS_HOAN_KIEM_APPLICATION + "_main_activity_counter";;
+    private static final String PREFS_CURRENT_POSITION = PREFS_HOAN_KIEM_APPLICATION + "_current_position";
+    private static final String PREFS_SHOULD_DOWNLOAD_DATA = PREFS_HOAN_KIEM_APPLICATION + "_should_download_data";
 
     private SharedPreferences preferences;
 
@@ -73,14 +81,9 @@ public class HoanKiemApplication extends Application {
         editor.putBoolean(PREFS_IS_FIRST_TIME, isFirstTime).commit();
     }
 
-    public String getContactUrl() {
-        getPreferences();
-        return preferences.getString(PREFS_CONTACT_URL, "https://manmo.vn/thong-tin-phap-ly.html");
-    }
-
     public String getAboutUsUrl() {
         getPreferences();
-        return preferences.getString(PREFS_ABOUT_US_URL, "https://manmo.vn/thong-tin-phap-ly.html");
+        return preferences.getString(PREFS_ABOUT_US_URL, "http://www.hoankiem360.com/hop-tac-kinh-doanh.html");
     }
 
     public void setContactUrl(String contactUrl) {
@@ -156,8 +159,51 @@ public class HoanKiemApplication extends Application {
     }
 
     public boolean isVietnamese() {
-        Log.d("MyTest--", "isVietnamese1: " +PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.PREF_KEY_LANGUAGES), Locale.getDefault().getLanguage()));
-        Log.d("MyTest--", "isVietnamese2: " + android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.PREF_KEY_LANGUAGES), Locale.getDefault().getLanguage()));
+//        Log.d("MyTest--", "isVietnamese1: " +PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.PREF_KEY_LANGUAGES), Locale.getDefault().getLanguage()));
+//        Log.d("MyTest--", "isVietnamese2: " + android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.PREF_KEY_LANGUAGES), Locale.getDefault().getLanguage()));
         return PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.PREF_KEY_LANGUAGES), Locale.getDefault().getLanguage()).equals("vi");
+    }
+
+    public boolean getIsFirstTimeLocationMapActivity() {
+        int counter = preferences.getInt(PREFS_MAP_ACTIVITY_COUNTER, 0);
+
+        if (counter <= 1) {
+            counter++;
+            preferences.edit().putInt(PREFS_MAP_ACTIVITY_COUNTER, counter).commit();
+            Log.d(TAG, "getIsFirstTimeMainActivity: counter = "+ counter    );
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean getIsFirstTimeMainActivity() {
+        int counter = preferences.getInt(PREFS_MAIN_ACTIVITY_COUNTER, 0);
+        if (counter <= 1) {
+            counter++;
+            Log.d(TAG, "getIsFirstTimeMainActivity: counter = "+ counter);
+            preferences.edit().putInt(PREFS_MAIN_ACTIVITY_COUNTER, counter).commit();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void setCurrentScrollPosition(int position) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(PREFS_CURRENT_POSITION, position).commit();
+    }
+
+    public int getCurrentScrollPosition() {
+        return preferences.getInt(PREFS_CURRENT_POSITION, 0);
+    }
+
+    public void setShouldDownloadData(boolean shouldDownloadData) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(PREFS_SHOULD_DOWNLOAD_DATA, shouldDownloadData).commit();
+    }
+
+    public boolean shouldDownloadData() {
+        return preferences.getBoolean(PREFS_SHOULD_DOWNLOAD_DATA, true);
     }
 }

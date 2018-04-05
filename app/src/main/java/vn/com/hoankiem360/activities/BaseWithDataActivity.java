@@ -1,28 +1,20 @@
 package vn.com.hoankiem360.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 
 import vn.com.hoankiem360.R;
-import vn.com.hoankiem360.adapters.LocationGroupAdapter;
-import vn.com.hoankiem360.infrastructure.Location;
-import vn.com.hoankiem360.infrastructure.LocationGroup;
 import vn.com.hoankiem360.utils.Constants;
 import vn.com.hoankiem360.utils.ViewUtils;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -33,82 +25,66 @@ public abstract class BaseWithDataActivity extends BaseActivity {
 
     private ViewGroup navDrawer;
     private DrawerLayout drawerLayout;
+    private LinearLayoutManager layoutManager;
+    private Parcelable recyclerState;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
         loadLocale();
     }
 
     private void loadLocale() {
         String selectedLanguage = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.PREF_KEY_LANGUAGES), "");
         // check if the current locale isn't the locale in shared preference
+        Log.d(TAG, "loadLocale: I'm here" + Locale.getDefault().getLanguage() + "\t" + selectedLanguage);
         if (!Locale.getDefault().getLanguage().equals(selectedLanguage)) {
+            Log.d(TAG, "loadLocale: I'm here: " + (Locale.getDefault().getLanguage().equals(selectedLanguage)));
             ViewUtils.updateLanguage(this, selectedLanguage);
         }
     }
 
-    // if groups == null, then the activity doesn't want the navigation drawer.
-    public void setContentView(@LayoutRes int layoutResID, ArrayList<LocationGroup> groups, boolean shouldShowNavigationDrawer) {
-        super.setContentView(R.layout.activity_base);
-        // truyền layoutResID vào frame_container trong activity_base.
-        ViewGroup container = (ViewGroup) findViewById(R.id.frame_container);
-        LayoutInflater.from(this).inflate(layoutResID, container, true);
+    // start fixing here
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        navDrawer = (ViewGroup) findViewById(R.id.activity_base_nav_drawer);
-
-        if (shouldShowNavigationDrawer) {
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-             if (groups == null) {
-                 groups = application.getDbHandle().getAllLocationGroups();
-             }
-            // lấy dữ liệu trong database.
-            final Location toan_canh_Location = application.getDbHandle().getLocations(groups.get(0).getGroupName()).get(0);
-
-            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.activity_base_nav_drawer_recyclerView);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-            ImageView imageView = (ImageView) findViewById(R.id.activity_base_nav_drawer_imageView);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // lấy location đầu tiên trong group đầu tiên
-
-                    startActivity(new Intent(BaseWithDataActivity.this, ShowImageActivity.class).putExtra(Constants.EXTRA_LOCATION, toan_canh_Location));
-                }
-            });
-            BaseWithDataActivity targetActivity;
-            if (this instanceof LocationMapActivity) {
-                targetActivity = new LocationMapActivity();
-            } else {
-                targetActivity = new LocationListActivity();
-            }
-            LocationGroupAdapter adapter = new LocationGroupAdapter(this, targetActivity, groups, R.layout.item_list_location_group_nav_drawer);
-            recyclerView.setAdapter(adapter);
-        } else {
-            navDrawer.setVisibility(View.GONE);
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        }
-    }
-    protected void openNavDrawer() {
-        if (!drawerLayout.isDrawerOpen(Gravity.START)) {
-            drawerLayout.openDrawer(Gravity.START);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (layoutManager!=null) {
+            outState.putParcelable(Constants.EXTRA_RECYCLER_STATE, layoutManager.onSaveInstanceState());
         }
     }
 
-    protected void closeNavDrawer() {
-        if (drawerLayout.isDrawerOpen(Gravity.START)) {
-            drawerLayout.closeDrawer(Gravity.START);
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Retrieve list state and list/item positions
+        if (savedInstanceState!=null) {
+            recyclerState = savedInstanceState.getParcelable(Constants.EXTRA_RECYCLER_STATE);
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (recyclerState!=null) {
+            layoutManager.onRestoreInstanceState(recyclerState);
+        }
+    }
+
     public void openActionBar() {
-        if (getSupportActionBar()!=null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().show();
         }
     }
+
     public void closeActionBar() {
-        if(getSupportActionBar()!=null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
     }

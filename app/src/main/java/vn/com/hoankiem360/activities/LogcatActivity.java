@@ -66,10 +66,4 @@ public abstract class LogcatActivity extends AppCompatActivity{
         Log.d(TAG, "onDestroy");
         super.onDestroy();
     }
-
-    @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        Log.d(TAG, "setContentView");
-        super.setContentView(layoutResID);
-    }
 }

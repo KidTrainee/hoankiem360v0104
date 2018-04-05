@@ -11,6 +11,10 @@
             android:title="@string/choose_languages"
             android:summary="defaultValue"/>
 
+        <Preference
+            android:title="@string/update_data"
+            android:key="@string/PREF_KEY_UPDATE_DATA"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

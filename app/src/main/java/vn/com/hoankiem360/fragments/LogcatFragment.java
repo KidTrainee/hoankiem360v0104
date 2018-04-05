@@ -14,7 +14,7 @@ import android.view.ViewGroup;
  */
 
 public abstract class LogcatFragment extends Fragment{
-    public String TAG = getClass().getSimpleName();
+    public String TAG = "MyFragment--" + getClass().getSimpleName();
 
     @Override
     public void onAttach(Context context) {

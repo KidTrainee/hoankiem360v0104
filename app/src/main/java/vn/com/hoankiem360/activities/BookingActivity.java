@@ -25,8 +25,12 @@ import com.android.volley.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
+import vn.com.hoankiem360.MainActivity;
 import vn.com.hoankiem360.R;
 import vn.com.hoankiem360.infrastructure.Location;
 import vn.com.hoankiem360.utils.Constants;
@@ -50,18 +54,23 @@ public class BookingActivity extends BaseWithDataActivity implements View.OnClic
     private Button bookingButton;
     private Location location;
 
+    private long minStartTime, minEndTime;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-//        location = getIntent().getParcelableExtra(Constants.EXTRA_LOCATION);
-        location = createFakeLocation();
+        location = getIntent().getParcelableExtra(Constants.EXTRA_LOCATION);
+//        location = createFakeLocation();
         Log.d(TAG, "onCreate: location = " + location.toString());
         if (location == null) {
             Log.e(TAG, "onCreate: lỗi 'location == null' khi khởi tạo BookingActivity từ class khác");
             return;
         }
 
-        setContentView(R.layout.activity_booking, null, false);
+        minStartTime = minEndTime = System.currentTimeMillis();
+
+        setContentView(R.layout.activity_booking);
 
         setupActivity();
 
@@ -79,26 +88,30 @@ public class BookingActivity extends BaseWithDataActivity implements View.OnClic
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(R.string.booking);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
         }
 
         // initialize views
-        hotelTitleTV = (TextView) findViewById(R.id.activity_booking_textView_hotel_title);
-        customerNameTextInput = (TextInputLayout) findViewById(R.id.activity_booking_textInputLayout_customer_name);
-        customerNumberRoomTextInput = (TextInputLayout) findViewById(R.id.activity_booking_textInputLayout_customer_room_numbers);
-        customerNumberPeopleTextInput = (TextInputLayout) findViewById(R.id.activity_booking_textInputLayout_customer_people_numbers);
-        customerDateStartTextInput = (TextInputLayout) findViewById(R.id.activity_booking_textInputLayout_customer_date_start);
-        customerDateEndTextInput = (TextInputLayout) findViewById(R.id.activity_booking_textInputLayout_customer_date_end);
-        customerDateStartTV = (TextView) findViewById(R.id.activity_booking_tv_check_in_date);
-        customerDateEndTV = (TextView) findViewById(R.id.activity_booking_tv_check_out_date);
-        customerPhoneTextInput = (TextInputLayout) findViewById(R.id.activity_booking_textInputLayout_customer_phone);
-        customerEmailTextInput = (TextInputLayout) findViewById(R.id.activity_booking_textInputLayout_customer_email);
-        bookingButton = (Button) findViewById(R.id.activity_booking_btn_booking);
+        hotelTitleTV = findViewById(R.id.activity_booking_textView_hotel_title);
+        customerNameTextInput = findViewById(R.id.activity_booking_textInputLayout_customer_name);
+        customerNumberRoomTextInput = findViewById(R.id.activity_booking_textInputLayout_customer_room_numbers);
+        customerNumberPeopleTextInput = findViewById(R.id.activity_booking_textInputLayout_customer_people_numbers);
+        customerDateStartTextInput = findViewById(R.id.activity_booking_textInputLayout_customer_date_start);
+        customerDateEndTextInput = findViewById(R.id.activity_booking_textInputLayout_customer_date_end);
+        customerDateStartTV = findViewById(R.id.activity_booking_tv_check_in_date);
+        customerDateEndTV = findViewById(R.id.activity_booking_tv_check_out_date);
+        customerPhoneTextInput = findViewById(R.id.activity_booking_textInputLayout_customer_phone);
+        customerEmailTextInput = findViewById(R.id.activity_booking_textInputLayout_customer_email);
+        bookingButton = findViewById(R.id.activity_booking_btn_booking);
+        setupUI();
+    }
+
+    private void setupUI() {
         if (application.isVietnamese()) {
             hotelTitleTV.setText(location.getLocationName());
         } else {
             hotelTitleTV.setText(location.getLocationNameEn());
         }
-
     }
 
     @Override
@@ -166,14 +179,21 @@ public class BookingActivity extends BaseWithDataActivity implements View.OnClic
                     try {
                         progressDialog.hide();
                         JSONObject jo = new JSONObject(response);
+                        Log.d(TAG, "onResponse: response = " + response.toString());
                         switch (Integer.parseInt(jo.getString(JsonKeys.CODE))) {
                             case 0:
                                 // TODO: 07-Oct-17 : design lại thông báo
                                 ViewUtils.makeToast(BookingActivity.this, R.string.submit_success);
-                                startActivity(new Intent(BookingActivity.this, MainActivity.class));
+                                ViewUtils.gotoMainActivity(BookingActivity.this);
                                 break;
                             case 1:
                                 ViewUtils.makeToast(BookingActivity.this, R.string.submit_error);
+                                break;
+                            case -2:
+                                ViewUtils.makeToast(BookingActivity.this, R.string.date_start_not_valid);
+                                break;
+                            case 2:
+                                ViewUtils.makeToast(BookingActivity.this, R.string.date_start_date_end_not_valid);
                                 break;
                             default:
                                 ViewUtils.makeToast(BookingActivity.this, R.string.error);
@@ -198,9 +218,9 @@ public class BookingActivity extends BaseWithDataActivity implements View.OnClic
         }
     }
 
-    private Location createFakeLocation() {
-        return new Location("", "Khách sạn Châu Duy Khánh", "No data","", "", "", "598980f8a5d814d74fd854f8");
-    }
+//    private Location createFakeLocation() {
+//        return new Location("", "Khách sạn Châu Duy Khánh", "No data","", "", "", "598980f8a5d814d74fd854f8");
+//    }
 
     private boolean checkEmpty(String[] strings, final TextInputLayout[] layouts, @StringRes int error) {
         for (int i = 0; i < strings.length; i++) {
@@ -252,8 +272,17 @@ public class BookingActivity extends BaseWithDataActivity implements View.OnClic
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 month = month + 1;
-                String date = dayOfMonth + "/" + month + "/" + year;
+                String date = dayOfMonth + "-" + month + "-" + year;
                 dateSelectTV.setText(date);
+                if (dateSelectTV.equals(customerDateStartTV)) {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    try {
+                        Date d = simpleDateFormat.parse(date);
+                        minEndTime = d.getTime();
+                    } catch (ParseException e) {
+                        Log.e(TAG, "onDateSet: ", e);
+                    }
+                }
             }
         };
 
@@ -267,8 +296,10 @@ public class BookingActivity extends BaseWithDataActivity implements View.OnClic
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (dateSelectTV.getId() == R.id.activity_booking_tv_check_in_date) {
                 dialog.setTitle(getResources().getString(R.string.check_in));
+                dialog.getDatePicker().setMinDate(minStartTime);
             } else {
                 dialog.setTitle(getResources().getString(R.string.check_out));
+                dialog.getDatePicker().setMinDate(minEndTime);
             }
         }
         dialog.show();

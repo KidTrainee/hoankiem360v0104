@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,11 +19,12 @@ import android.view.ViewGroup;
 
 import vn.com.hoankiem360.activities.BaseWithDataActivity;
 import vn.com.hoankiem360.R;
+import vn.com.hoankiem360.activities.BookingActivity;
+import vn.com.hoankiem360.activities.LocationListActivity;
 import vn.com.hoankiem360.activities.SettingsActivity;
 import vn.com.hoankiem360.activities.ShowImageActivity;
 import vn.com.hoankiem360.adapters.LocationAdapter;
 import vn.com.hoankiem360.database.DBHandle;
-import vn.com.hoankiem360.infrastructure.HoanKiemApplication;
 import vn.com.hoankiem360.infrastructure.Location;
 import vn.com.hoankiem360.infrastructure.LocationGroup;
 import vn.com.hoankiem360.utils.Constants;
@@ -30,12 +32,11 @@ import vn.com.hoankiem360.utils.ViewUtils;
 
 import java.util.ArrayList;
 
-/**
- * Created by Binh on 23-Sep-17.
- */
+import static vn.com.hoankiem360.utils.Constants.EXTRA_RECYCLER_STATE;
 
 public class LocationListFragment extends BaseFragment
-        implements LocationAdapter.OnLocationClickListener{
+        implements LocationAdapter.OnLocationClickListener,
+        LocationAdapter.OnBookingClickListener {
 
     public static final String TAG = LocationListFragment.class.getSimpleName();
 
@@ -43,7 +44,8 @@ public class LocationListFragment extends BaseFragment
     private ArrayList<Location> locationList;
     private LocationAdapter locationAdapter;
     private DBHandle db;
-    private LinearLayoutManager layoutManager;
+    private LinearLayoutManager locationLayoutManager;
+    private LocationListActivity activity;
 
     public static LocationListFragment newInstance(LocationGroup locationGroup) {
         Log.d(TAG, "newInstance");
@@ -64,13 +66,13 @@ public class LocationListFragment extends BaseFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (BaseWithDataActivity) activity;
+        this.activity = (LocationListActivity) activity;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate: savedInstanceState == null " + (savedInstanceState==null));
+        Log.d(TAG, "onCreate: savedInstanceState == null " + (savedInstanceState == null));
         db = activity.getHoanKiemApplication().getDbHandle();
         group = getArguments().getParcelable(Constants.EXTRA_LOCATION_GROUP);
         if (group == null) {
@@ -86,34 +88,36 @@ public class LocationListFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location_list, container, false);
-        Log.d(TAG, "onCreateView: savedInstanceState == null : " + (savedInstanceState==null));
+        Log.d(TAG, "onCreateView: savedInstanceState == null : " + (savedInstanceState == null));
 
-        if (savedInstanceState!=null) {
-            Log.d(TAG, "onCreateView: savedInstanceState: " + (savedInstanceState.getParcelable(Constants.EXTRA_RECYCLER_STATE)).toString());
-        }
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.fragment_location_list_recyclerView);
+        RecyclerView recyclerView = view.findViewById(R.id.fragment_location_list_recyclerView);
 
-        layoutManager = new LinearLayoutManager(activity);
+        locationLayoutManager = new LinearLayoutManager(activity);
 
         // save recycler view state
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(locationLayoutManager);
 
         locationAdapter = new LocationAdapter(activity, locationList);
         recyclerView.setAdapter(locationAdapter);
-
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState == null) return;
+        // get saved info of views here.
+        Log.d(TAG, "onActivityCreated: (savedInstanceState.getParcelable(EXTRA_RECYCLER_STATE) == null) = " + (savedInstanceState.getParcelable(EXTRA_RECYCLER_STATE) == null));
+        locationLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(EXTRA_RECYCLER_STATE));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        outState.putParcelable(Constants.EXTRA_RECYCLER_STATE, layoutManager.onSaveInstanceState());
+        if (locationLayoutManager != null) {
+            outState.putParcelable(EXTRA_RECYCLER_STATE, locationLayoutManager.onSaveInstanceState());
+        }
 
     }
 
@@ -154,7 +158,7 @@ public class LocationListFragment extends BaseFragment
         group = newGroup;
         showLoadingEffect();
         locationAdapter.replaceData(db.getLocations(newGroup.getGroupName()));
-
+        activity.updateGroup(newGroup);
     }
 
     private void showLoadingEffect() {
@@ -172,6 +176,12 @@ public class LocationListFragment extends BaseFragment
     public void onLocationClick(Location location) {
         Log.d(TAG, "onLocationClick: location = " + location.toString());
         startActivity(new Intent(activity, ShowImageActivity.class).putExtra(Constants.EXTRA_LOCATION, location));
+    }
+
+    @Override
+    public void onBookingClick(Location location) {
+        Log.d(TAG, "onBookingClick: location = " + location.toString());
+        startActivity(new Intent(activity, BookingActivity.class).putExtra(Constants.EXTRA_LOCATION, location));
     }
 
 //    private void doSearch() {

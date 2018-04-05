@@ -56,7 +56,6 @@ public abstract class BaseActivity extends LogcatActivity {
                         public void onPermissionGranted() {
 
                         }
-
                         @Override
                         public void onPermissionDenied() {
                             finish();
@@ -90,6 +89,4 @@ public abstract class BaseActivity extends LogcatActivity {
                     .show();
         }
     }
-
-
 }

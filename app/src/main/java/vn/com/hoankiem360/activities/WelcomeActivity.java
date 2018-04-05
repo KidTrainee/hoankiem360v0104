@@ -3,18 +3,23 @@ package vn.com.hoankiem360.activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 
+import vn.com.hoankiem360.MainActivity;
 import vn.com.hoankiem360.database.DBHandle;
 import vn.com.hoankiem360.infrastructure.Location;
 import vn.com.hoankiem360.infrastructure.LocationGroup;
 import vn.com.hoankiem360.requests.GetStringRequest;
 import vn.com.hoankiem360.R;
 import vn.com.hoankiem360.utils.Constants;
+import vn.com.hoankiem360.utils.DataUtils;
 import vn.com.hoankiem360.utils.JsonKeys;
+import vn.com.hoankiem360.utils.ViewUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,22 +32,41 @@ import java.util.ArrayList;
  */
 
 public class WelcomeActivity extends BaseActivity {
+
+    private TextView textView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_welcome);
         Log.d(TAG, "onCreate: I'm here");
-
+        bindViews();
         // get data from internet.
-        Response.Listener<String> listener = new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "onResponse: I'm here");
-                AsyncSaver asyncSaver = new AsyncSaver();
-                asyncSaver.execute(response);
-            }
-        };
-        application.getQueue().add(new GetStringRequest(Constants.DATA_URL, listener));
+        if (application.shouldDownloadData()) {
+            Response.Listener<String> listener = new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    textView.setText(R.string.processing_data);
+                    WelcomeActivity.AsyncSaver asyncSaver = new WelcomeActivity.AsyncSaver();
+                    asyncSaver.execute(response);
+                }
+            };
+            application.getQueue().add(new GetStringRequest(Constants.DATA_URL, listener));
+            application.setShouldDownloadData(false);
+        } else {
+            (new Handler()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ViewUtils.gotoMainActivity(WelcomeActivity.this);
+                }
+            }, 1000);
+        }
+    }
+
+    private void bindViews() {
+        textView = findViewById(R.id.activity_welcome_textView_text);
+        textView.setText(R.string.loading);
     }
 
     private class AsyncSaver extends AsyncTask<String, Void, Void> {
@@ -61,7 +85,7 @@ public class WelcomeActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+            ViewUtils.gotoMainActivity(WelcomeActivity.this);
             finish();
         }
     }
@@ -116,7 +140,7 @@ public class WelcomeActivity extends BaseActivity {
                     String locationGps = joLocation.getString(JsonKeys.GPS);
                     String locationLat, locationLng, locationIdHotel;
                     if (locationGps.length() > 0) {
-                        // change the server location from ("...,...") to locationLat = "...", locationLng = "...")
+                        // change the server location from ("...,...") to lo  cationLat = "...", locationLng = "...")
                         locationLat = locationGps.substring(0, locationGps.indexOf(","));
                         locationLng = locationGps.substring(locationGps.indexOf(",") + 1, locationGps.length());
                         Log.d(TAG, "onResponse: locationGps = " + locationGps

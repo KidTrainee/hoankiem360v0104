@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="language_array">
-        <item>Tiếng Việt</item>
+        <item>Vietnamese</item>
         <item>English</item>
     </string-array>
     <string-array name="language_array_code">
         <item>vi</item>
         <item>en</item>
     </string-array>
+    <declare-styleable name="AvatarImageBehavior">
+        <attr name="finalYPosition" format="dimension"/>
+        <attr name="startXPosition" format="dimension"/>
+        <attr name="startToolbarPosition" format="dimension"/>
+        <attr name="startHeight" format="dimension"/>
+        <attr name="finalHeight" format="dimension"/>
+    </declare-styleable>
 </resources>

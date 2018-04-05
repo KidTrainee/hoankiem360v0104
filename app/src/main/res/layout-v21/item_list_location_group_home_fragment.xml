@@ -5,15 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="150dp"
     android:layout_margin="5dp"
-    android:elevation="10dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/colorWhite"
     app:cardCornerRadius="8dp">
 
     <ImageView
         android:id="@+id/item_list_location_group_nav_drawer_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorWhite"
-        android:scaleType="fitXY" />
+        android:scaleType="fitXY"
+        android:src="@drawable/background3"/>
 
     <LinearLayout
         android:layout_width="match_parent"

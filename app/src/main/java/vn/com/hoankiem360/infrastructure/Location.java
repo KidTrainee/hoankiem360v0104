@@ -3,6 +3,8 @@ package vn.com.hoankiem360.infrastructure;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.HashMap;
+
 /**
  * Created by Binh on 23-Sep-17.
  */
@@ -11,9 +13,11 @@ public class Location implements Parcelable{
     public static final String TAG = Location.class.getSimpleName();
 
     private String locationGroupName, locationName, locationNameEn, locationUrl, locationLat, locationLng, locationIdHotel;
+    private int locationGroupIcon;
 
     public Location(String locationGroupName, String locationName, String locationNameEn, String locationUrl, String locationLat, String locationLng, String locationIdHotel) {
         this.locationGroupName = locationGroupName;
+
         this.locationName = locationName;
         this.locationNameEn = locationNameEn;
         this.locationUrl = locationUrl;
@@ -127,4 +131,5 @@ public class Location implements Parcelable{
                 ", locationIdHotel='" + locationIdHotel + '\'' +
                 '}';
     }
+
 }

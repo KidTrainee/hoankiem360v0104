@@ -131,8 +131,7 @@ public class PermissionRequest {
                 permissionStrings += "\n"+permission;
             }
             Log.d(TAG, "PermissionRequest.showRationale: permissionStrings = "+permissionStrings);
-            msg = String.format(mActivity.getString(R.string.permission_rationale),
-                    permissionStrings);
+            msg = String.format("$2s", permissionStrings);
         } else {
             // App supplied rationale.
             msg = mActivity.getString(mRationaleId);
@@ -155,7 +154,7 @@ public class PermissionRequest {
             // Set title and message.
             alertDialogBuilder.setTitle("Permission Request")
                     .setMessage(msg)
-                    .setCancelable(true)
+                    .setCancelable(false)
                     .setPositiveButton(R.string.permissions_ok_button, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

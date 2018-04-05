@@ -4,11 +4,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -24,22 +26,22 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 
 import vn.com.hoankiem360.R;
 import vn.com.hoankiem360.activities.BaseWithDataActivity;
-import vn.com.hoankiem360.activities.LocationListActivity;
-import vn.com.hoankiem360.activities.MainActivity;
 import vn.com.hoankiem360.activities.ShowImageActivity;
 import vn.com.hoankiem360.adapters.LocationAdapter;
 import vn.com.hoankiem360.database.DBHandle;
 import vn.com.hoankiem360.infrastructure.Location;
+import vn.com.hoankiem360.infrastructure.LocationClusterRenderer;
 import vn.com.hoankiem360.infrastructure.LocationGroup;
+import vn.com.hoankiem360.infrastructure.LocationClusterMarker;
 import vn.com.hoankiem360.utils.Constants;
-import vn.com.hoankiem360.utils.PermissionRequest;
 import vn.com.hoankiem360.utils.SingleShotLocationProvider;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Binh on 23-Sep-17.
@@ -48,9 +50,9 @@ import java.util.ArrayList;
 public class LocationMapFragment extends SupportMapFragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
         GoogleMap.OnCameraChangeListener,
-        LocationAdapter.OnLocationClickListener {
+        LocationAdapter.OnLocationClickListener{
 
-    public static final String TAG = LocationMapFragment.class.getSimpleName();
+    public static final String TAG = "MyTest--" + LocationMapFragment.class.getSimpleName();
 
     private static final LatLng HOAN_KIEM = new LatLng(Constants.DEFAULT_LATITUDE, Constants.DEFAULT_LONGITUDE);
 
@@ -60,14 +62,27 @@ public class LocationMapFragment extends SupportMapFragment
     private LatLngBounds.Builder builder;
     private DBHandle db;
     private LocationGroup group;
-    private ArrayList<Marker> markers;
-    private ArrayList<LocationGroup> checkedGroups;
-    private ArrayList<Location> checkedLocations;
+    private ArrayList<Location> selectedLocations;
+    private HashMap<String, Integer> iconMap;
+    private ClusterManager<LocationClusterMarker> clusterManager;
+    private int[] icons = new int[]{
+            R.drawable.ic_01, R.drawable.ic_02, R.drawable.ic_03, R.drawable.ic_04, R.drawable.ic_05,
+            R.drawable.ic_06, R.drawable.ic_07, R.drawable.ic_08, R.drawable.ic_09, R.drawable.ic_10,
+            R.drawable.ic_11, R.drawable.ic_12};
 
     public static LocationMapFragment newInstance(LocationGroup locationGroup) {
 
         Bundle args = new Bundle();
         args.putParcelable(Constants.EXTRA_LOCATION_GROUP, locationGroup);
+        LocationMapFragment fragment = new LocationMapFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static LocationMapFragment newInstance() {
+
+        Bundle args = new Bundle();
+
         LocationMapFragment fragment = new LocationMapFragment();
         fragment.setArguments(args);
         return fragment;
@@ -83,62 +98,113 @@ public class LocationMapFragment extends SupportMapFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Log.d(TAG, "onAttach");
         this.activity = (BaseWithDataActivity) activity;
+        db = this.activity.getHoanKiemApplication().getDbHandle();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        checkPermission();
         setHasOptionsMenu(true);
         // put getMapAsync here so that the app load map and get data from Database at the same time
         getMapAsync(this);
+        setUpMapIcon();
 
-        db = activity.getHoanKiemApplication().getDbHandle();
         group = getArguments().getParcelable(Constants.EXTRA_LOCATION_GROUP);
-        Log.d(TAG, "onCreate: group.getGroupName() = " + group.getGroupName());
+        Log.d(TAG, "onCreate: group==null" + (group == null));
         if (group == null) {
             Log.e(TAG, "onCreate: group == null");
+            locationList = db.getAllLocationsWithGps();
+            Log.d(TAG, "onCreate: locationList = " + locationList.size());
+        } else {
+            locationList = new ArrayList<>();
+            if (group != null) {
+                locationList.addAll(db.getLocationsWithGps(group.getGroupName()));
+                Log.d(TAG, "onCreate: group.getGroupName() = " + group.getGroupName());
+            }
+        }
+    }
+
+    private void setUpMapIcon() {
+        iconMap = new HashMap<>();
+        ArrayList<LocationGroup> groups = db.getAllLocationGroupsWithRealLocations();
+        Log.d(TAG, "setUpMapIcon: groups.size() = " + groups.size() + "\t" + icons.length);
+        if (groups.size() != icons.length) {
+            Log.e(TAG, "setUpMapIcon: error input");
             return;
         }
-        locationList = db.getLocationsWithGps(group.getGroupName());
+        for (int i = 0; i < groups.size(); i++) {
+            iconMap.put(groups.get(i).getGroupName(), icons[i]);
+        }
+//        Log.d(TAG, "setUpMapIcon: iconMap = " + iconMap.toString());
     }
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
-        markers = new ArrayList<>();
-        checkedGroups = new ArrayList<>();
-        checkedLocations = new ArrayList<>();
-        this.googleMap.setOnMarkerClickListener(this);
-        this.googleMap.setOnCameraChangeListener(this);
+
+        initializeCluster();
+
+        selectedLocations = new ArrayList<>();
+        Log.d(TAG, "onMapReady: I'm here");
+//        this.googleMap.setOnMarkerClickListener(this);
+//        this.googleMap.setOnCameraChangeListener(this);
         setupMyCurrentPositionButton();
         // this class is used to zoom in close enough to show all markers
-        addLocationListToMap(locationList);
+        notifyChangeOnMap(locationList);
+    }
+
+    private void initializeCluster() {
+        Log.d(TAG, "initializeCluster: I'm here");
+        clusterManager = new ClusterManager<>(activity, this.googleMap);
+
+        LocationClusterRenderer renderer = new LocationClusterRenderer(activity, googleMap, clusterManager);
+        clusterManager.setRenderer(renderer);
+
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<LocationClusterMarker>() {
+            @Override
+            public boolean onClusterItemClick(LocationClusterMarker locationClusterMarker) {
+                String locationName = locationClusterMarker.getTitle();
+                Log.d(TAG, "onMarkerClick: markerTitle = " + locationName
+                        + "\tlocationList.size = " + locationList.size());
+                for (Location location : locationList) {
+                    if (location.getLocationName().equals(locationName)) {
+                        return showInfoWindow(location);
+                    }
+                }
+                return false;
+            }
+        });
+
+        googleMap.setOnMarkerClickListener(clusterManager);
+        googleMap.setOnCameraIdleListener(clusterManager);
+        googleMap.setOnInfoWindowClickListener(clusterManager);
+        googleMap.setInfoWindowAdapter(clusterManager.getMarkerManager());
     }
 
     /**
      * create new
+     *
      * @param locationList: list of locations added to map
      * @return markerCount: number of available markers on map
      */
-    private void addLocationListToMap(ArrayList<Location> locationList) {
+    private void notifyChangeOnMap(ArrayList<Location> locationList) {
+        googleMap.clear();
+        clusterManager.clearItems();
+//        clearMarkers();
         int markerCount = 0;
-        CameraPosition.Builder target = CameraPosition.builder()
-                .zoom(12)
-                .bearing(0)
-                .tilt(90);
         if (locationList.isEmpty()) {
-            Log.e(TAG, "addLocationListToMap: locationList is empty");
+            Log.e(TAG, "notifyChangeOnMap: locationList is empty");
             return;
         }
         // clear markers in LatLngBounds builders
-        if (builder!=null) {
+        if (builder != null) {
             builder = null;
         }
         builder = new LatLngBounds.Builder();
-        Log.d(TAG, "addLocationListToMap: locationList.size() = " + locationList.size());
+        Log.d(TAG, "notifyChangeOnMap: locationList.size() = " + locationList.size());
 
         for (Location location : locationList) {
             // check validity of location position.
@@ -147,33 +213,55 @@ public class LocationMapFragment extends SupportMapFragment
                 locationLat = Double.parseDouble(location.getLocationLat());
                 locationLng = Double.parseDouble(location.getLocationLng());
                 LatLng latLng = new LatLng(locationLat, locationLng);
-                markers.add(googleMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title(location.getLocationName())
-                        .alpha(0.5f)));
-                // add marker to LatLngBound.Builder class.
-                builder.include(latLng);
-                markerCount++;
 
+                try {
+                    clusterManager.addItem(new LocationClusterMarker(latLng, location.getLocationName(), iconMap.get(location.getLocationGroupName())));
+                    builder.include(latLng);
+                    markerCount++;
+                } catch (NullPointerException e) {
+                    Log.e(TAG, "notifyChangeOnMap: ", e);
+                }
             }
         }
 
-        if (markerCount >= 2) {
-            LatLngBounds bounds = builder.build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder()
-                    .target(bounds.getCenter())
-                    .tilt(90)
-                    .bearing(0)
-                    .build()));
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 160));
+        if (markerCount != 0) {
+            final LatLngBounds bounds = builder.build();
 
-        } else {
-            googleMap.addMarker(new MarkerOptions().position(HOAN_KIEM).title("Hoàn Kiếm"));
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(target.target(HOAN_KIEM).build()));
+            CameraUpdate update = CameraUpdateFactory.newLatLngBounds(bounds, 160);
+            googleMap.animateCamera(update, new GoogleMap.CancelableCallback() {
+                @Override
+                public void onFinish() {
+                    float zoom = googleMap.getCameraPosition().zoom;
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                            .zoom(zoom)
+                            .target(bounds.getCenter())
+                            .tilt(45)
+                            .build()));
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+            });
         }
     }
 
+
     private void setupMyCurrentPositionButton() {
+        if (ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
@@ -201,10 +289,12 @@ public class LocationMapFragment extends SupportMapFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_my_location:
-
+//                DataUtils.checkMyPermission(activity);
                 final ProgressDialog loadingDialog = new ProgressDialog(activity);
                 loadingDialog.setMessage(getString(R.string.loading_position));
-
+                if (!googleMap.isMyLocationEnabled()) {
+                    setupMyCurrentPositionButton();
+                }
                 android.location.Location currentLocation = googleMap.getMyLocation();
                 if (currentLocation != null) {
                     addLocation(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
@@ -225,35 +315,10 @@ public class LocationMapFragment extends SupportMapFragment
     }
 
     private void addLocation(LatLng latLng) {
-//        googleMap.addMarker(
-//                new MarkerOptions()
-//                        .position(latLng)
-//                        .title(getString(R.string.action_my_location)));
         builder.include(latLng);
 
         LatLngBounds bounds = builder.build();
         googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 160));
-    }
-
-    private void checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PermissionRequest.with(activity)
-                    .permissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    .rationale(R.string.permission_request_location)
-                    .granted(R.string.thank_you_message)
-                    .callback(new PermissionRequest.Callback() {
-                        @Override
-                        public void onPermissionGranted() {
-//                            getCurrentLocation();
-                        }
-
-                        @Override
-                        public void onPermissionDenied() {
-                            startActivity(new Intent(activity, MainActivity.class));
-                        }
-                    })
-                    .submit();
-        }
     }
 
     @Override
@@ -262,6 +327,8 @@ public class LocationMapFragment extends SupportMapFragment
         // filter markerId (e.g: m1 --> 1) to get the corresponding location in locationList
         String markerId = marker.getId();
         String locationName = marker.getTitle();
+        Log.d(TAG, "onMarkerClick: markerTitle = " + locationName
+                + "\tlocationList.size = " + locationList.size());
         for (Location location : locationList) {
             if (location.getLocationName().equals(locationName)) {
                 return showInfoWindow(location);
@@ -308,7 +375,7 @@ public class LocationMapFragment extends SupportMapFragment
 
     public void replaceGroup(LocationGroup newGroup) {
         Log.d(TAG, "replaceGroup: newGroup = " + newGroup.getGroupName()
-        + "\n" + "group = " + group.getGroupName());
+                + "\n" + "group = " + group.getGroupName());
         if (newGroup == null) {
             return;
         }
@@ -317,20 +384,10 @@ public class LocationMapFragment extends SupportMapFragment
             return;
         }
         group = newGroup;
-        googleMap.clear();
-        clearMarkers();
         locationList.clear();
         locationList = db.getLocationsWithGps(newGroup.getGroupName());
         Log.d(TAG, "replaceGroup: locationList.size() = " + locationList.size());
-        addLocationListToMap(locationList);
-    }
-
-    private void clearMarkers() {
-        if (markers != null && (markers.size()!=0)) {
-            for (Marker marker : markers) {
-                marker.remove();
-            }
-        }
+        notifyChangeOnMap(locationList);
     }
 
     private void showInfoFragment(Location location) {
@@ -339,23 +396,35 @@ public class LocationMapFragment extends SupportMapFragment
     }
 
     @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-        Log.d(TAG, "onCameraChange");
-    }
-
-    @Override
     public void onLocationClick(Location location) {
         Log.d(TAG, "onLocationClick: location = " + location.toString());
     }
 
-    public void checkGroup(LocationGroup newGroup) {
-        if (checkedGroups.contains(newGroup)) {
-            checkedGroups.remove(newGroup);
-            checkedLocations.removeAll(db.getLocationsWithGps(newGroup.getGroupName()));
-        } else {
-            checkedGroups.add(newGroup);
-            checkedLocations.addAll(db.getLocationsWithGps(newGroup.getGroupName()));
+    public void notifyDataSetChanged(ArrayList<LocationGroup> selectedGroups) {
+        Log.d(TAG, "notifyDataSetChanged: selectedGroups = " + selectedGroups.size());
+        locationList.clear();
+        for (LocationGroup group : selectedGroups) {
+            locationList.addAll(db.getLocationsWithGps(group.getGroupName()));
         }
-        addLocationListToMap(checkedLocations);
+        notifyChangeOnMap(locationList);
     }
+
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+    }
+
+//    private class MyCustomAdapterForItems implements GoogleMap.InfoWindowAdapter {
+//        @Override
+//        public View getInfoWindow(Marker marker) {
+//            View infoView = activity.getLayoutInflater().inflate(R.layout.custom_google_map_info_window_without_booking, null);
+//            ((TextView) infoView.findViewById(R.id.custom_google_map_info_window_without_booking_tv_location_name)).setText(location.getLocationName());
+//
+//            return infoView;
+//        }
+//
+//        @Override
+//        public View getInfoContents(Marker marker) {
+//            return null;
+//        }
+//    }
 }

@@ -9,6 +9,7 @@ import android.os.Parcelable;
 
 public class LocationGroup implements Parcelable{
     private String groupName, groupNameEn, groupImage, locationNumber, locationWithGpsNumber;
+    private boolean isGroupSelected = true;
 
     public LocationGroup(String groupName, String groupNameEn, String groupImage, String locationNumber, String locationWithGpsNumber) {
         this.groupName = groupName;
@@ -17,7 +18,6 @@ public class LocationGroup implements Parcelable{
         this.locationNumber = locationNumber;
         this.locationWithGpsNumber = locationWithGpsNumber;
     }
-
 
     protected LocationGroup(Parcel in) {
         groupName = in.readString();
@@ -90,5 +90,13 @@ public class LocationGroup implements Parcelable{
                 ", locationNumber='" + locationNumber + '\'' +
                 ", locationWithGpsNumber='" + locationWithGpsNumber + '\'' +
                 '}';
+    }
+
+    public boolean getIsGroupSelected() {
+        return isGroupSelected;
+    }
+
+    public void setIsGroupSelected(boolean isGroupSelected) {
+        this.isGroupSelected = isGroupSelected;
     }
 }

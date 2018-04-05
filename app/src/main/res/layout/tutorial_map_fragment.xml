@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:id="@+id/center_alignment"/>
+
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="@string/tutorial_swipe_right_to_open_drawerlayout"
+        android:layout_above="@+id/center_alignment"
+        android:textColor="@color/colorWhite"
+        android:layout_marginBottom="@dimen/height50dp"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

@@ -13,8 +13,6 @@ public class InfoActivity extends BaseWithDataActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info, null, false);
-
-
+        setContentView(R.layout.activity_info);
     }
 }

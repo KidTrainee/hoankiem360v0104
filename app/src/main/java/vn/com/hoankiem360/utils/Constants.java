@@ -26,4 +26,5 @@ public class Constants {
     public static final String HOTEL_GROUP = "khach_san";
     // TODO: 07-Oct-17 add link order hotel.
     public static final String LINK_ORDER_HOTEL = "https://manmo.vn/orderHotel";
+    public static final String LINK_ABOUT_US = "http://hoankiem360.vn/ve-chung-toi.html";
 }

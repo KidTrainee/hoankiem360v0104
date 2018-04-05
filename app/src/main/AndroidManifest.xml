@@ -12,11 +12,10 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/logo_hoankiem_app"
+        android:icon="@drawable/logo_app"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-
         android:name="vn.com.hoankiem360.infrastructure.HoanKiemApplication"
         android:theme="@style/AppTheme.NoActionBar">
 
@@ -26,22 +25,23 @@
         <meta-data android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBWlBLtH9ECoZLglj89bPfP2TQkeL0LZCs"/>
 
-        <activity android:name="vn.com.hoankiem360.activities.MainActivity"
+        <activity android:name="vn.com.hoankiem360.MainActivity"
             android:screenOrientation="portrait"/>
 
         <activity android:name="vn.com.hoankiem360.activities.LocationListActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName="vn.com.hoankiem360.activities.MainActivity">
+            android:parentActivityName="vn.com.hoankiem360.MainActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value="vn.com.hoankiem360.activities.MainActivity"/>
+                android:value="vn.com.hoankiem360.MainActivity"/>
         </activity>
 
         <activity android:name="vn.com.hoankiem360.activities.LocationMapActivity"
-            android:parentActivityName="vn.com.hoankiem360.activities.MainActivity"
+            android:parentActivityName="vn.com.hoankiem360.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize">
 
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value="vn.com.hoankiem360.activities.MainActivity"/>
+                android:value="vn.com.hoankiem360.MainActivity"/>
 
         </activity>
 
@@ -49,8 +49,9 @@
 
         <activity android:name="vn.com.hoankiem360.activities.ShowImageActivity"
             android:parentActivityName="vn.com.hoankiem360.activities.LocationListActivity"
-            android:configChanges="orientation|screenSize"
-            android:hardwareAccelerated="true">
+            android:hardwareAccelerated="true"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoStatusBar">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
             android:value="vn.com.hoankiem360.activities.LocationListActivity"/>
         </activity>

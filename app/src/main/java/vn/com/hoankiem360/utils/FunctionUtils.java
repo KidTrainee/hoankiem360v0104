@@ -6,6 +6,7 @@ import android.net.Uri;
 
 import vn.com.hoankiem360.activities.BaseWithDataActivity;
 import vn.com.hoankiem360.infrastructure.Location;
+import vn.com.hoankiem360.infrastructure.LocationGroup;
 
 /**
  * Created by Binh on 04-Oct-17.
@@ -33,6 +34,5 @@ public class FunctionUtils {
             }
         }
     }
-
 
 }

@@ -1,13 +1,16 @@
 package vn.com.hoankiem360.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -33,24 +36,30 @@ public class ShowImageActivity extends BaseWithDataActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: savedInstanceState == null : " + (savedInstanceState==null));
 
-        location = getIntent().getParcelableExtra(Constants.EXTRA_LOCATION);
+        if (savedInstanceState!=null) {
+            location = savedInstanceState.getParcelable(Constants.EXTRA_LOCATION);
+        } else {
+            location = getIntent().getParcelableExtra(Constants.EXTRA_LOCATION);
+        }
+
+        Log.d(TAG, "onCreate: location = " + location.toString() );
 
         setContentView(R.layout.activity_show_image);
         setupActivity();
-        webView = (WebView) findViewById(R.id.activity_show_image_webView);
+        webView =  findViewById(R.id.activity_show_image_webView);
 
         WebSettings settings = webView.getSettings();
-
-//        settings.setAllowFileAccess(true);
         settings.setJavaScriptEnabled(true);
-//        settings.setDomStorageEnabled(true);
-//        settings.setDatabaseEnabled(true);
-//        settings.setDatabasePath(getApplicationContext().getCacheDir().getAbsolutePath() + "/database");
-//        settings.setAppCacheEnabled(true);
-//        settings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath() + "/cache");
-//        settings.setAppCacheMaxSize(20 * 1024 * 1024); // 20MB
-//        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);// load online by default
+        settings.setAllowFileAccess(true);
+        settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setDatabasePath(getApplicationContext().getCacheDir().getAbsolutePath() + "/database");
+        settings.setAppCacheEnabled(true);
+        settings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath() + "/cache");
+        settings.setAppCacheMaxSize(20 * 1024 * 1024); // 20MB
+        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);// load online by default
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -79,30 +88,54 @@ public class ShowImageActivity extends BaseWithDataActivity {
                 webView.loadUrl(location.getLocationUrl());
             }
         });
-
+        Log.d(TAG, "onCreate: url = " + location.getLocationUrl());
         webView.loadUrl(location.getLocationUrl());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.e(TAG, "onConfigurationChanged");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        super.onSaveInstanceState(outState);
+        if (location!=null) {
+            outState.putParcelable(Constants.EXTRA_LOCATION, location);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState!=null) {
+            location = savedInstanceState.getParcelable(Constants.EXTRA_LOCATION);
+        }
     }
 
     private void setupActivity() {
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.activity_show_image_toolbar);
+        Toolbar toolbar = findViewById(R.id.activity_show_image_toolbar);
 
 //        TextView activityTitle = (TextView) toolbar.findViewById(R.id.activity_show_image_activityTitle);
 
         setSupportActionBar(toolbar);
-        if (getSupportActionBar()!=null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar!=null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
         }
 //        activityTitle.setText(location.getLocationName());
         if (!location.getLocationIdHotel().isEmpty()) {
             showBookingButton();
         }
-
     }
 
     private void showBookingButton() {
-        FloatingActionButton bookingFab = (FloatingActionButton) findViewById(R.id.activity_show_image_fab_booking);
+        FloatingActionButton bookingFab = findViewById(R.id.activity_show_image_fab_booking);
         bookingFab.setVisibility(View.VISIBLE);
         bookingFab.setOnClickListener(new View.OnClickListener() {
             @Override

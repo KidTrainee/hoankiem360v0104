@@ -57,39 +57,44 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
             @Override
             public void onClick(View v) {
                 // get the fragment inside the activity and turn it to OnLocationClickListener
-                int fragmentList = activity.getSupportFragmentManager().getFragments().size();
-
-                Log.d(TAG, "onClick: " + fragmentList);
-
                 if (activity.getHoanKiemApplication().getLocationMode().equals(Constants.LOCATION_MODE_LIST)) {
                     ((OnLocationClickListener) activity.getSupportFragmentManager().findFragmentByTag(LocationListFragment.getTAG())).onLocationClick(location);
                 } else if (activity.getHoanKiemApplication().getLocationMode().equals(Constants.LOCATION_MODE_MAP)){
                     ((OnLocationClickListener) activity.getSupportFragmentManager().findFragmentByTag(LocationMapFragment.getTAG())).onLocationClick(location);
                 }
 
+                Log.d(TAG, "onBindViewHolder: location = " + location.toString());
             }
         });
-        final String locationIdHotel = location.getLocationIdHotel();
 
-        // these codes for checking if an activity is available on phone or not
-//        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-//        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-//        List<ResolveInfo> pkgAppsList = activity.getPackageManager().queryIntentActivities( mainIntent, 0);
-//        for (ResolveInfo info : pkgAppsList) {
-//            Log.d(TAG, "onBindViewHolder: info = " + info.activityInfo.targetActivity);
-//        }
+        holder.bookingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((OnBookingClickListener) activity.getSupportFragmentManager().findFragmentByTag(LocationListFragment.getTAG())).onBookingClick(location);
+            }
+        });
+
+        final String locationIdHotel = location.getLocationIdHotel();
 
         // check if the location is available for booking.
         if (!locationIdHotel.isEmpty()) {
-
             holder.bookingButton.setVisibility(View.VISIBLE);
-            holder.bookingButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.startActivity(new Intent(activity, BookingActivity.class).putExtra(Constants.EXTRA_LOCATION, location));
-                }
-            });
+        } else {
+            holder.bookingButton.setVisibility(View.GONE);
         }
+
+//        if (!locationIdHotel.isEmpty()) {
+//
+//            holder.bookingButton.setVisibility(View.VISIBLE);
+//            Log.d(TAG, "onBindViewHolder: location = "+ location.toString());
+//            holder.bookingButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Log.d(TAG, "onBindViewHolder: locationList = " + locationList.size() + "\t" + position);
+//                    activity.startActivity(new Intent(activity, BookingActivity.class).putExtra(Constants.EXTRA_LOCATION, location));
+//                }
+//            });
+//        }
     }
 
     @Override
@@ -116,5 +121,9 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
 
     public interface OnLocationClickListener {
         void onLocationClick(Location location);
+    }
+
+    public interface OnBookingClickListener {
+        void onBookingClick(Location location);
     }
 }

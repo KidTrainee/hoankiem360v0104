@@ -1,27 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/colorPrimary"
-    android:orientation="vertical"
-    android:gravity="center">
+    android:background="@drawable/gradient"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/activity_welcome_center_view"
+        android:layout_centerInParent="true"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/activity_welcome_relativeLayout_logo"
+        android:layout_above="@+id/activity_welcome_center_view">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/actionBarSize"
+            android:src="@drawable/logo_app"
+            android:layout_centerInParent="true"
+            android:id="@+id/activity_welcome_logo"/>
+
+        <net.bohush.geometricprogressview.GeometricProgressView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/activity_welcome_progressBar"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center_horizontal"
+            app:gp_number_of_angles="70"
+            app:gp_type="kite"
+            app:gp_color="@color/colorYellow"
+            app:gp_figure_padding="3dp"
+            app:gp_duration="2000"/>
+
+    </RelativeLayout>
+
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/logo"
-        android:id="@+id/activity_welcome_logo"
-        android:layout_gravity="center"/>
+        android:layout_height="?attr/actionBarSize"
+        android:src="@drawable/ten_hoan_kiem"
+        android:id="@+id/activity_welcome_name"
+        android:padding="8dp"
+        android:layout_below="@id/activity_welcome_center_view"/>
 
-    <net.bohush.geometricprogressview.GeometricProgressView
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:gp_color="@color/colorWhite"
-        android:layout_marginTop="32dp"
-        android:layout_gravity="center_horizontal"
-        app:gp_number_of_angles="12"
-        app:gp_type="kite"
-        app:gp_duration="350"/>
+        android:id="@+id/activity_welcome_textView_text"
+        android:text="@string/loading"
+        android:layout_marginBottom="?attr/actionBarSize"
+        android:textColor="@color/colorWhiteTransparent75"
+        android:layout_alignParentBottom="true"
+        android:textStyle="italic"
+        android:gravity="center"/>
 
-</LinearLayout>
+
+</RelativeLayout>
